@@ -1,7 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DewAspServices</AssemblyName>
+    <RootNamespace>DewCore.AspNetCore.Services</RootNamespace>
+    <Authors>Andrea Vincenzo Abbondanza</Authors>
+    <Company>Dew Studio S.R.L.S.</Company>
+    <Product>Dew Asp Services</Product>
+    <Description>Services for aspnet core</Description>
+    <PackageProjectUrl>https://github.com/andreabbondanza/DewAspServices</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/andreabbondanza/DewAspServices</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/andreabbondanza/DewAspServices/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageTags>AspNetCore asp .net aspnet .netcore dotnetcore aspnet web services</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageIconUrl>http://andrewdev.eu/wp-content/uploads/2016/08/OnlyLogo.png</PackageIconUrl>
+    <Version>1.0.0</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage></NeutralLanguage>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\DewAspServices.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\DewAspServices.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>

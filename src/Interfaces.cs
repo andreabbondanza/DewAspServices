@@ -11,33 +11,29 @@ namespace DewCore.AspNetCore.Services
         /// Get a service. Check before singletons, after scoping and if not found it will return instance
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetService<T>(DewServiceArgs param = null) where T : class, IService, new();
+        T GetService<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get Service istance
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceInstance<T>(DewServiceArgs param = null) where T : class, IService, new();
+        T GetServiceInstance<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get Service scoped
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceScoped<T>(DewServiceArgs param = null) where T : class, IService, new();
+        T GetServiceScoped<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get singleton
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceSingleton<T>(DewServiceArgs param = null) where T : class, IService, new();
+        T GetServiceSingleton<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
     }
     /// <summary>
     /// Tag interface for root services
     /// </summary>
     public interface IRootService : IService
-    {   
-        /// <summary>
-        /// The init state of the root service
-        /// </summary>
-        /// <value></value>
-        bool InitState { get; set; }
+    {
+
     }
     /// <summary>
     /// Service interface
