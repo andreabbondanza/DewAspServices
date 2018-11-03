@@ -6,7 +6,7 @@ namespace DewCore.AspNetCore.Services
     /// <summary>
     /// Service argument class
     /// </summary>
-    public class DewServiceArgs
+    public class ServiceArgs
     {
         private Dictionary<string, object> _args = new Dictionary<string, object>();
         /// <summary>
@@ -16,7 +16,7 @@ namespace DewCore.AspNetCore.Services
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException">A key already exists</exception>
-        public DewServiceArgs Add(string key, object value)
+        public ServiceArgs Add(string key, object value)
         {
             _args.Add(key, value);
             return this;
@@ -26,7 +26,7 @@ namespace DewCore.AspNetCore.Services
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public DewServiceArgs Add(object value)
+        public ServiceArgs Add(object value)
         {
             _args.Add(value.GetType().Name, value);
             return this;
@@ -64,13 +64,13 @@ namespace DewCore.AspNetCore.Services
     /// <summary>
     /// Current services class
     /// </summary>
-    public class DewServices : IDewServices
+    public class ServicesContainer : IServicesContainer
     {
         /// <summary>
         /// Initialize the services object
         /// </summary>
         /// <returns></returns>
-        public static DewServices GetServices() => new DewServices();
+        public static ServicesContainer GetServices() => new ServicesContainer();
         private static Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
         private Dictionary<Type, object> _services = new Dictionary<Type, object>();
         /// <summary>
@@ -80,17 +80,17 @@ namespace DewCore.AspNetCore.Services
         /// <param name="isRoot">Must be true if you are calling a RootService</param>
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ServiceNotInitializedException">A rooteservice init without isRoot = true></exception>
-        public T GetServiceScoped<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        public T GetServiceScoped<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             if (_services.ContainsKey(typeof(T)))
                 return (T)_services[typeof(T)];
             else
             {
-                this.RegisterScoped<T>(param);
-                return GetServiceScoped<T>(param);
+                this.RegisterScoped<T>(param, isRoot);
+                return GetServiceScoped<T>(param, isRoot);
             }
         }
-        private void RegisterScoped<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        private void RegisterScoped<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             if (!_services.ContainsKey(typeof(T)))
             {
@@ -102,7 +102,7 @@ namespace DewCore.AspNetCore.Services
                 _services.Add(typeof(T), service);
             }
         }
-        private void RegisterSingleton<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        private void RegisterSingleton<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             if (!_singletons.ContainsKey(typeof(T)))
             {
@@ -121,7 +121,7 @@ namespace DewCore.AspNetCore.Services
         /// <param name="isRoot">Must be true if you are calling a RootService</param>
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ServiceNotInitializedException">A rooteservice init without isRoot = true></exception>
-        public T GetServiceInstance<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        public T GetServiceInstance<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             var service = new T();
             if (!isRoot && service is IRootService)
@@ -138,14 +138,14 @@ namespace DewCore.AspNetCore.Services
         /// <param name="isRoot">Must be true if you are calling a RootService</param>
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ServiceNotInitializedException">A rooteservice init without isRoot = true></exception>
-        public T GetServiceSingleton<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        public T GetServiceSingleton<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             if (_singletons.ContainsKey(typeof(T)))
                 return (T)_singletons[typeof(T)];
             else
             {
-                this.RegisterSingleton<T>(param);
-                return GetServiceSingleton<T>(param);
+                this.RegisterSingleton<T>(param, isRoot);
+                return GetServiceSingleton<T>(param, isRoot);
             }
         }
         /// <summary>
@@ -154,7 +154,7 @@ namespace DewCore.AspNetCore.Services
         /// <param name="param">Service args</param>
         /// <param name="isRoot">Must be true if you are calling a RootService</param>
         /// <typeparam name="T"></typeparam>
-        public T GetService<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
+        public T GetService<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new()
         {
             if (_singletons.ContainsKey(typeof(T)))
                 return (T)_singletons[typeof(T)];
@@ -162,5 +162,7 @@ namespace DewCore.AspNetCore.Services
                 return (T)_services[typeof(T)];
             return GetServiceInstance<T>(param);
         }
+
+        private ServicesContainer() { }
     }
 }

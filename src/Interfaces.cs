@@ -5,28 +5,28 @@ namespace DewCore.AspNetCore.Services
     /// <summary>
     /// Services interface
     /// </summary>
-    public interface IDewServices
+    public interface IServicesContainer
     {
         /// <summary>
         /// Get a service. Check before singletons, after scoping and if not found it will return instance
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetService<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
+        T GetService<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get Service istance
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceInstance<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
+        T GetServiceInstance<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get Service scoped
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceScoped<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
+        T GetServiceScoped<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
         /// <summary>
         /// Get singleton
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        T GetServiceSingleton<T>(DewServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
+        T GetServiceSingleton<T>(ServiceArgs param = null, bool isRoot = false) where T : class, IService, new();
     }
     /// <summary>
     /// Tag interface for root services
@@ -44,11 +44,11 @@ namespace DewCore.AspNetCore.Services
         /// Request the dependencies from services object
         /// </summary>
         /// <param name="services"></param>
-        void RequestDependencyServices(IDewServices services);
+        void RequestDependencyServices(IServicesContainer services);
         /// <summary>
         /// Init a service
         /// </summary>
         /// <param name="param"></param>
-        void InitService(DewServiceArgs param = null);
+        void InitService(ServiceArgs param = null);
     }
 }
