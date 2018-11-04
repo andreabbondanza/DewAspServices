@@ -22,7 +22,7 @@ This because, when you create the service from startup with the requested argume
 
 This way to be has been choseed because is better to get a __ServiceNotInitializedException__ and understand the problem that get a generic Exception (nullreference, keynotfound, etc.) and get mad.
 
-A normal service however, can be requested also with arguments.
+A normal service however, can be requested also with arguments, but you have to be careful about exceptions if your service is another service dependency.
 
 ## Services scoping
 
@@ -33,3 +33,70 @@ You can register three types of service:
 
 ## Container class
 
+The container class has the task to distribuite the services, it has:
+
+- __GetServiceSingleton\<T\>__: a method that return the instance of T (if exists) or create one of it, it works via singleton patterns, so it will be the same for all the serverup time
+- __GetServiceScoped\<T\>__: a method that return the instance of T (if exists) or create one of it, it works for all ther time of the request
+- __GetServiceInstance\<T\>__: a method that return the instance of T (if exists) or create one of it, it works for instance (like a new)
+- __GetService\<T\>__: a method that return the instance of T (if exists) or create one of it. It call in order:
+- - 1) GetServiceSingleton 
+- - 2) GetServiceScoped 
+- - 3) GetServiceInstance
+
+## How it works
+
+To get the current service container you just need to call:
+```csharp
+HttpContext.GetServiceContainer();
+```
+In the controller.
+
+### Startup class
+
+Probably you want to configure services before the controller action starts, for this there is a __Middleware__ that works like the _ConfigureServices_ method in the Startup Class.
+
+Here an example:
+
+```csharp
+ app.UseDewAspServices(serviceContainer =>
+{
+    var cfService = serviceContainer.GetServiceSingleton<ConfigService>(); // initialize service
+    cfService.DoStuff(); // if you need do stuff
+});
+```
+With async:
+```csharp
+ app.UseDewAspServices(async (serviceContainer) =>
+{
+    serviceContainer.GetServiceSingleton<FileService>(new ServiceArgs().Add(env.ContentRootFileProvider).Add(env.ContentRootPath), true); // example with args
+    var confService = services.GetServiceSingleton<ConfigService>();
+    await confService.ReloadService();
+});
+```
+
+Note the __true__ second argument for _FileService_ service. It indicates that the FileService is a __ROOT__ service.
+
+### Passing arguments to a Service
+
+As you can see from the examples above, to pass arguments to a service initialization you must use the __ServiceArgs__ collection type.
+
+To pass an argument you need just to do:
+
+```csharp
+serviceContainer.GetServiceSingleton<FileService>(new ServiceArgs().Add(env.ContentRootFileProvider).Add(env.ContentRootPath), true); // example with args
+// OR 
+serviceContainer.GetServiceSingleton<FileService>(new ServiceArgs().Add("FileProvider",env.ContentRootFileProvider).Add("RootPath",env.ContentRootPath), true); // example with args
+```
+
+In this example we are passing the _ContentRootFileProvider_ and the _ContentRoot_ path to our FileService.
+
+Let's see how we can read them:
+
+```csharp
+public void InitService(ServiceArgs param)
+{
+    _providerByType = param.GetArgument<PhysicalFileProvider>(); // get file provider by its type
+    _pathByTypeKey = param.GetArgument("String") as string; // get root path by its type used as Key
+    _pathByKey = param.GetArgument("RootPath"); // get root path by its key
+}
+```

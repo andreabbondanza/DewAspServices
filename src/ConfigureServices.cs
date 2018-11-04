@@ -12,6 +12,7 @@ public class DewAspServicesMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly Action<IServicesContainer> _action;
+    private readonly Func<IServicesContainer, Task> _asyncAction;
     /// <summary>
     /// Constructor
     /// </summary>
@@ -23,6 +24,16 @@ public class DewAspServicesMiddleware
         _action = action;
     }
     /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="next">Next middleware</param>
+    /// <param name="action">Configure service action</param>
+    public DewAspServicesMiddleware(RequestDelegate next, Func<IServicesContainer, Task> action)
+    {
+        _next = next;
+        _asyncAction = action;
+    }
+    /// <summary>
     /// Invoke method
     /// </summary>
     /// <param name="context"></param>
@@ -32,6 +43,10 @@ public class DewAspServicesMiddleware
         var scontainer = ServicesContainer.GetServices();
         context.Items.Add("DewServiceContainer", scontainer);
         _action?.Invoke(scontainer);
+        if (_asyncAction != null)
+        {
+            await _asyncAction.Invoke(scontainer);
+        }
         await _next(context);
     }
 }
@@ -66,6 +81,17 @@ public static class DewAspServicesBuilderExtension
     /// <returns></returns>
     public static IApplicationBuilder UseDewAspServices(
        this IApplicationBuilder builder, Action<IServicesContainer> configureServices)
+    {
+        return builder.UseMiddleware<DewAspServicesMiddleware>(configureServices);
+    }
+    /// <summary>
+    /// Builder method
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureServices">Configure service action string</param>
+    /// <returns></returns>
+    public static IApplicationBuilder UseDewAspServices(
+       this IApplicationBuilder builder, Func<IServicesContainer, Task> configureServices)
     {
         return builder.UseMiddleware<DewAspServicesMiddleware>(configureServices);
     }
